@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head}"></head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+    <article style="max-width: 600px; margin: 0 auto;">
+
+        <hgroup>
+            <h2>Добавить автомобиль</h2>
+            <p>Введите данные вашего транспортного средства</p>
+        </hgroup>
+
+        <form th:action="@{/cars/add}" th:object="${addCarDTO}" method="post">
+
+            <label>
+                Марка
+                <input type="text" th:field="*{make}"
+                       placeholder="Например: BMW"
+                       required
+                       th:errorclass="is-invalid">
+                <small style="color: #ff6b6b;" th:if="${#fields.hasErrors('make')}" th:errors="*{make}"></small>
+            </label>
+
+            <label>
+                Модель
+                <input type="text" th:field="*{model}"
+                       placeholder="Например: X5"
+                       required
+                       th:errorclass="is-invalid">
+                <small style="color: #ff6b6b;" th:if="${#fields.hasErrors('model')}" th:errors="*{model}"></small>
+            </label>
+
+            <label>
+                Госномер (Без пробелов, кириллица)
+                <input type="text" th:field="*{licensePlate}"
+                       placeholder="А123АА777"
+                       required
+                       th:errorclass="is-invalid">
+
+                <small style="color: #ff6b6b;" th:if="${#fields.hasErrors('licensePlate')}" th:errors="*{licensePlate}"></small>
+
+                <small class="secondary" style="display: block; margin-top: 5px;">
+                    Формат: А123АА777 (6-9 символов)
+                </small>
+            </label>
+
+            <button type="submit" class="contrast" style="margin-top: 20px;">Сохранить автомобиль</button>
+
+        </form>
+    </article>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

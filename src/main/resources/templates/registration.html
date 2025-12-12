@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head}"></head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+
+  <article style="max-width: 600px; margin: 0 auto;">
+
+    <hgroup style="text-align: center; margin-bottom: 30px;">
+      <h1>Регистрация</h1>
+      <p>Создайте аккаунт, чтобы пользоваться сервисом</p>
+    </hgroup>
+
+    <div th:if="${message}"
+         style="background-color: #ffcccc; color: #cc0000; padding: 10px; border-radius: 5px; margin-bottom: 20px; text-align: center;"
+         th:text="${message}">
+    </div>
+
+    <form th:action="@{/registration}" th:object="${userDto}" method="post">
+
+      <div class="grid">
+        <label>
+          ФИО
+          <input type="text" th:field="*{fullName}" placeholder="Иванов Иван Иванович" required>
+        </label>
+        <label>
+          Возраст
+          <input type="number" th:field="*{age}" placeholder="18" required min="18">
+        </label>
+      </div>
+
+      <label>
+        Email
+        <input type="email" th:field="*{email}" placeholder="user@example.com" required>
+      </label>
+
+      <label>
+        Телефон
+        <input type="text" th:field="*{phoneNumber}" placeholder="+7 (999) 000-00-00" required>
+      </label>
+
+      <label>
+        Я хочу:
+        <select th:field="*{role}" required>
+          <option value="DRIVER">🚗 Только искать парковки (Водитель)</option>
+          <option value="OWNER">🅿️ Только сдавать места (Владелец)</option>
+          <option value="BOTH">🔄 И то, и другое</option>
+        </select>
+      </label>
+
+      <div class="grid">
+        <label>
+          Пароль
+          <input type="password" th:field="*{password}" placeholder="••••••" required>
+        </label>
+        <label>
+          Повторите пароль
+          <input type="password" th:field="*{confirmPassword}" placeholder="••••••" required>
+        </label>
+      </div>
+
+      <button type="submit" class="contrast" style="margin-top: 20px;">Создать аккаунт</button>
+    </form>
+
+    <footer style="text-align: center; margin-top: 20px;">
+      <small>Уже есть аккаунт? <a href="/login">Войти</a></small>
+    </footer>
+
+  </article>
+
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head}"></head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+
+    <article style="max-width: 500px; margin: 0 auto;">
+
+        <hgroup style="text-align: center; margin-bottom: 30px;">
+            <h1>Вход в систему</h1>
+            <p>Добро пожаловать обратно!</p>
+        </hgroup>
+
+        <div th:if="${param.error}" style="background-color: #ffcccc; color: #cc0000; padding: 10px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+            Неверный email или пароль.
+        </div>
+        <div th:if="${param.logout}" style="background-color: #ccffcc; color: #006600; padding: 10px; border-radius: 5px; margin-bottom: 20px; text-align: center;">
+            Вы успешно вышли из системы.
+        </div>
+
+        <form th:action="@{/login}" method="post">
+
+            <label>
+                Email
+                <input type="text" name="email" placeholder="user@example.com" required>
+            </label>
+
+            <label>
+                Пароль
+                <input type="password" name="password" placeholder="••••••" required>
+            </label>
+
+            <label style="margin-bottom: 20px; display: block;">
+                <input type="checkbox" name="remember-me"> Запомнить меня
+            </label>
+
+            <button type="submit" class="contrast">Войти</button>
+        </form>
+
+        <footer style="text-align: center; margin-top: 20px;">
+            <small>Нет аккаунта? <a href="/registration">Зарегистрироваться</a></small>
+        </footer>
+
+    </article>
+
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

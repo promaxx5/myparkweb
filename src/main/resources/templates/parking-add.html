@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head}"></head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+    <article style="max-width: 800px; margin: 0 auto;">
+
+        <hgroup>
+            <h2>Добавить парковку</h2>
+            <p>Заполните информацию, чтобы сдать место в аренду</p>
+        </hgroup>
+
+        <form th:action="@{/parkings/add}" th:object="${addParkingDTO}" method="post">
+
+            <div class="grid">
+                <label>
+                    Название
+                    <input type="text" th:field="*{name}"
+                           placeholder="Например: Гараж у метро"
+                           required
+                           th:errorclass="is-invalid">
+                    <small style="color: #ff6b6b;" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+                </label>
+
+                <label>
+                    Адрес
+                    <input type="text" th:field="*{address}"
+                           placeholder="ул. Ленина, 1"
+                           required
+                           th:errorclass="is-invalid">
+                    <small style="color: #ff6b6b;" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></small>
+                </label>
+            </div>
+
+            <div class="grid">
+                <label>
+                    Тип места
+                    <select th:field="*{parkingType}" th:errorclass="is-invalid">
+                        <option value="Открытая парковка">Открытая парковка</option>
+                        <option value="Крытая парковка">Крытая парковка</option>
+                        <option value="Подземный паркинг">Подземный паркинг</option>
+                        <option value="Гараж">Гараж</option>
+                    </select>
+                </label>
+
+                <label>
+                    Количество мест
+                    <input type="number" th:field="*{countPlaces}" min="1" value="1" th:errorclass="is-invalid">
+                    <small style="color: #ff6b6b;" th:if="${#fields.hasErrors('countPlaces')}" th:errors="*{countPlaces}"></small>
+                </label>
+            </div>
+
+            <div class="grid">
+                <label>
+                    Цена за час (₽)
+                    <input type="number" th:field="*{pricePerHour}" step="0.1" min="0" placeholder="0.0" th:errorclass="is-invalid">
+                    <small style="color: #ff6b6b;" th:if="${#fields.hasErrors('pricePerHour')}" th:errors="*{pricePerHour}"></small>
+                </label>
+
+                <label>
+                    Цена за день (₽)
+                    <input type="number" th:field="*{pricePerDay}" step="1" min="0" placeholder="0.0" th:errorclass="is-invalid">
+                    <small style="color: #ff6b6b;" th:if="${#fields.hasErrors('pricePerDay')}" th:errors="*{pricePerDay}"></small>
+                </label>
+            </div>
+
+            <fieldset style="margin-top: 20px;">
+                <legend>Удобства и особенности</legend>
+                <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+                    <label><input type="checkbox" th:field="*{forDisabled}"> ♿ Для инвалидов</label>
+                    <label><input type="checkbox" th:field="*{hasSecurity}"> 👮 Охрана</label>
+                    <label><input type="checkbox" th:field="*{hasCctv}"> 📹 Видеонаблюдение</label>
+                    <label><input type="checkbox" th:field="*{hasLighting}"> 💡 Освещение</label>
+                    <label><input type="checkbox" th:field="*{hasBarrier}"> 🚧 Шлагбаум</label>
+                    <label><input type="checkbox" th:field="*{hasEvCharger}"> ⚡ Зарядка EV</label>
+                </div>
+            </fieldset>
+
+            <button type="submit" class="contrast" style="margin-top: 20px;">Добавить парковку</button>
+
+        </form>
+    </article>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head}"></head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+
+    <div style="margin-bottom: 30px;">
+        <hgroup>
+            <h1>Доступные парковки</h1>
+            <p>Выберите удобное место для вашего автомобиля</p>
+        </hgroup>
+
+        <form action="/parkings" method="get" style="display: flex; gap: 10px;">
+            <input type="search" name="search" th:value="${search}" placeholder="Поиск по адресу (например, Ленина)..." style="margin-bottom: 0;">
+            <button type="submit" class="contrast" style="width: auto;">Найти</button>
+        </form>
+    </div>
+
+    <div th:if="${!parkings.empty}">
+
+        <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+
+            <article th:each="p : ${parkings}" style="padding: 0; overflow: hidden; border: 1px solid #2d3748; border-radius: 8px; display: flex; flex-direction: column;">
+
+                <div style="background-color: #1e262e; padding: 15px; border-bottom: 1px solid #2d3748;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="background: #e2e8f0; color: #333; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: bold;">
+                            <span th:text="${p.parkingType}">Тип</span>
+                        </span>
+                        <strong style="color: #ff9800;" th:text="${p.averageRating != null and p.averageRating > 0 ? '⭐ ' + p.averageRating : '⭐ New'}">5.0</strong>
+                    </div>
+                </div>
+
+                <div style="padding: 15px; display: flex; flex-direction: column; flex-grow: 1;">
+                    <h4 th:text="${p.name}" style="margin-bottom: 5px; font-size: 1.1rem;">Название</h4>
+                    <small style="color: #a0aec0; display: block; margin-bottom: 20px; flex-grow: 1;" th:text="${p.address}">Адрес</small>
+
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px dashed #2d3748; padding-top: 15px;">
+                        <div>
+                            <strong style="font-size: 1.2rem; color: #1095c1;" th:text="${p.pricePerHour}">100</strong>
+                            <small style="color: gray;">₽ / час</small>
+                        </div>
+                        <a th:href="@{/parkings/{id}(id=${p.id})}" role="button" class="outline" style="padding: 6px 20px; font-size: 0.9rem; border-radius: 20px;">
+                            Выбрать
+                        </a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div style="margin-top: 50px; display: flex; justify-content: center; gap: 15px; align-items: center;">
+
+            <a th:href="@{/parkings(page=${currentPage - 1}, search=${search})}"
+               role="button"
+               class="outline secondary"
+               th:if="${currentPage > 0}">
+                ← Назад
+            </a>
+            <button disabled class="outline secondary" th:unless="${currentPage > 0}" style="opacity: 0.3; cursor: not-allowed;">← Назад</button>
+
+            <small style="color: gray; font-weight: bold;">
+                Страница <span th:text="${currentPage + 1}" style="color: white;">1</span> из <span th:text="${totalPages}">10</span>
+            </small>
+
+            <a th:href="@{/parkings(page=${currentPage + 1}, search=${search})}"
+               role="button"
+               class="outline secondary"
+               th:if="${currentPage + 1 < totalPages}">
+                Вперед →
+            </a>
+            <button disabled class="outline secondary" th:unless="${currentPage + 1 < totalPages}" style="opacity: 0.3; cursor: not-allowed;">Вперед →</button>
+
+        </div>
+
+    </div>
+
+    <div th:if="${parkings.empty}" style="text-align: center; padding: 60px 20px; border: 2px dashed #333; border-radius: 10px; margin-top: 20px;">
+        <h3 style="margin-bottom: 10px;">😔 Ничего не найдено</h3>
+        <p style="color: gray;">Попробуйте изменить параметры поиска или очистить фильтр.</p>
+        <a href="/parkings" role="button" class="secondary outline">Сбросить поиск</a>
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

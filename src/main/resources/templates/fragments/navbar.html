@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<nav th:fragment="navbar" class="container" style="max-width: 95%; padding-left: 2rem; padding-right: 2rem;">
+  <ul>
+    <li>
+      <a href="/" style="font-weight: 800; font-size: 1.5rem; text-decoration: none; color: #1095c1;">
+        ParkEasy 🚗
+      </a>
+    </li>
+  </ul>
+  <ul>
+    <li><a href="/parkings">Найти парковку</a></li>
+
+    <li sec:authorize="hasAnyRole('DRIVER', 'BOTH', 'ADMIN', 'MODERATOR')">
+      <a href="/cars/add">Добавить авто</a>
+    </li>
+
+    <li sec:authorize="hasAnyRole('OWNER', 'BOTH', 'ADMIN', 'MODERATOR')">
+      <a href="/parkings/add">Сдать место</a>
+    </li>
+
+    <li sec:authorize="!isAuthenticated()">
+      <a href="/login" role="button" class="outline">Войти</a>
+    </li>
+    <li sec:authorize="!isAuthenticated()">
+      <a href="/registration" role="button">Регистрация</a>
+    </li>
+
+    <li sec:authorize="isAuthenticated()">
+      <details role="list" dir="rtl">
+        <summary aria-haspopup="listbox" role="link" class="secondary">
+          👤 <span sec:authentication="name">User</span>
+        </summary>
+        <ul role="listbox">
+          <li><a href="/profile">Мой кабинет</a></li>
+          <li>
+            <form th:action="@{/logout}" method="post" style="margin: 0; padding: 0;">
+              <button type="submit"
+                      style="background: none; border: none; color: #ff5757; cursor: pointer; padding: 0.5rem 1rem; width: 100%; text-align: right;">
+                Выйти
+              </button>
+            </form>
+          </li>
+        </ul>
+      </details>
+    </li>
+  </ul>
+</nav>
+</html>

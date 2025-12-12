@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/head :: head}"></head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+
+    <div class="grid" style="margin-bottom: 50px; align-items: center;">
+        <div>
+            <h1 style="font-size: 3rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px;">
+                Найдите идеальную парковку <span style="color: #1095c1;">рядом с вами</span>
+            </h1>
+            <p style="font-size: 1.1rem; margin-bottom: 30px; color: #6c757d;">
+                Бронируйте места заранее или сдавайте свое свободное место, пока вы на работе. Безопасно, удобно, выгодно.
+            </p>
+
+            <div class="grid" style="max-width: 400px; gap: 15px;">
+                <a href="/parkings" role="button" class="contrast">🔍 Найти место</a>
+
+                <a href="/parkings/add"
+                   role="button"
+                   class="secondary outline"
+                   sec:authorize="hasAnyRole('OWNER', 'BOTH', 'ADMIN', 'MODERATOR')">
+                    ➕ Сдать место
+                </a>
+            </div>
+        </div>
+
+        <div style="padding-left: 20px;">
+
+            <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+                <hgroup style="margin-bottom: 0;">
+                    <h4 style="margin: 0;">🔥 Сейчас в топе</h4>
+                    <small style="color: #8b9bb4;">Выбор пользователей</small>
+                </hgroup>
+                <a href="/parkings" style="font-size: 0.8rem; text-decoration: none; color: #1095c1;">Все →</a>
+            </div>
+
+            <article th:if="${#lists.isEmpty(trendingParkings)}" style="padding: 20px; text-align: center; color: gray; border: 1px dashed #444;">
+                <p style="margin:0;">Данных пока нет 📉</p>
+            </article>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+
+                <article th:each="p : ${trendingParkings}"
+                         style="padding: 0; overflow: hidden; border-radius: 12px; background-color: #161f27; border: 1px solid #2d3748; display: flex; flex-direction: column; height: 100%;">
+
+                    <div style="height: 8px; background: linear-gradient(90deg, #ff5722, #ff9800);"></div>
+
+                    <div style="padding: 15px; display: flex; flex-direction: column; flex-grow: 1;">
+
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                            <a th:href="@{/parkings/{id}(id=${p.id})}"
+                               style="text-decoration: none; font-weight: bold; color: #e2e8f0; line-height: 1.2; font-size: 1rem;">
+                                <span th:text="${p.name}">Название</span>
+                            </a>
+                            <span style="background: rgba(255, 152, 0, 0.15); color: #ff9800; padding: 2px 6px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; white-space: nowrap;">
+                                ★ <span th:text="${p.averageRating}">5.0</span>
+                            </span>
+                        </div>
+
+                        <div style="color: #718096; font-size: 0.8rem; margin-bottom: 15px; flex-grow: 1;">
+                            📍 <span th:text="${p.address}">Адрес</span>
+                        </div>
+
+                        <div style="padding-top: 10px; border-top: 1px dashed #2d3748; display: flex; align-items: center; justify-content: space-between;">
+                            <div style="font-size: 0.9rem;">
+                                <b style="color: #4fd1c5;" th:text="${p.pricePerHour}">100</b> <span style="font-size: 0.7rem; color: gray;">₽/ч</span>
+                            </div>
+                            <a th:href="@{/bookings/create/{id}(id=${p.id})}"
+                               role="button"
+                               class="outline"
+                               style="padding: 4px 10px; font-size: 0.75rem; border-radius: 20px; border-width: 1px;">
+                                Бронь
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </div>
+
+    <hr style="margin: 40px 0;">
+
+    <article>
+        <header>🚀 Быстрый поиск</header>
+        <form action="/parkings" method="get" style="display: flex; gap: 10px; margin-bottom: 0;">
+            <input type="search" name="search" placeholder="Введите адрес (например, 'Центр')..." style="margin-bottom: 0;">
+            <button type="submit" style="width: auto;">Найти</button>
+        </form>
+    </article>
+
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/head :: head}"></head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+
+    <nav aria-label="breadcrumb" style="margin-bottom: 20px;">
+        <ul>
+            <li><a href="/parkings" class="secondary">← Назад к списку</a></li>
+        </ul>
+    </nav>
+
+    <div class="grid">
+
+        <div>
+            <hgroup>
+                <h1 th:text="${parking.name}" style="margin-bottom: 5px;">Название парковки</h1>
+                <p style="color: gray; font-size: 1.1rem;">
+                    📍 <span th:text="${parking.address}">Адрес</span>
+                </p>
+            </hgroup>
+
+            <div style="margin-bottom: 30px; display: flex; align-items: center; gap: 10px;">
+                <div style="background: #FFF8E1; color: #FFA000; padding: 5px 10px; border-radius: 8px; font-weight: bold;">
+                    ★ <span th:text="${parking.averageRating}">4.5</span>
+                </div>
+                <small style="color: gray;">(на основе отзывов)</small>
+            </div>
+
+            <article>
+                <header style="margin-bottom: 10px; font-weight: bold;">Удобства и особенности</header>
+                <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                    <div th:if="${parking.isForDisabled}">♿ Для инвалидов</div>
+                    <div th:if="${parking.hasSecurity}">👮 Охрана</div>
+                    <div th:if="${parking.hasCctv}">📹 Камеры</div>
+                    <div th:if="${parking.hasLighting}">💡 Освещение</div>
+                    <div th:if="${parking.hasEvCharger}">⚡ Зарядка EV</div>
+                    <div th:if="${parking.hasBarrier}">🚧 Шлагбаум</div>
+                </div>
+                <p th:if="${!parking.isForDisabled and !parking.hasSecurity and !parking.hasCctv and !parking.hasLighting and !parking.hasEvCharger}" style="color: gray; font-style: italic;">
+                    Описание удобств отсутствует.
+                </p>
+            </article>
+        </div>
+
+        <div>
+            <article style="border: 2px solid #1095c1; position: sticky; top: 20px;">
+                <header style="text-align: center; background-color: #1095c1; color: white;">
+                    <strong>Стоимость аренды</strong>
+                </header>
+
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h2 style="margin-bottom: 0; color: #1095c1;">
+                        <span th:text="${parking.pricePerHour}">100</span> ₽
+                    </h2>
+                    <small>за час</small>
+                    <hr style="margin: 15px 0;">
+                    <p style="margin-bottom: 0;">
+                        <span th:text="${parking.pricePerDay}">800</span> ₽ / сутки
+                    </p>
+                </div>
+
+                <a th:href="@{/bookings/create/{id}(id=${parking.id})}"
+                   role="button"
+                   class="contrast"
+                   style="width: 100%;">
+                    📅 Забронировать место
+                </a>
+
+                <div sec:authorize="isAuthenticated()" style="margin-top: 15px;">
+                    <a th:href="@{/parkings/{id}/delete(id=${parking.id})}"
+                       th:if="${parking.ownerId == #authentication.principal.user.id or #authorization.expression('hasAnyRole(''MODERATOR'', ''ADMIN'')')}"
+                       onclick="return confirm('Вы уверены, что хотите удалить эту парковку безвозвратно?');"
+                       role="button"
+                       class="outline secondary"
+                       style="width: 100%; border-color: #ff6b6b; color: #ff6b6b;">
+                        🗑 Удалить парковку
+                    </a>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <hr style="margin: 40px 0;">
+
+    <h3>💬 Отзывы пользователей</h3>
+
+    <div class="grid">
+
+        <div>
+            <div th:if="${#lists.isEmpty(parking.reviews)}" style="padding: 20px; background: #f0f0f0; border-radius: 8px; color: gray;">
+                Отзывов пока нет. Будьте первым!
+            </div>
+
+            <article th:each="review : ${parking.reviews}" style="margin-bottom: 15px; padding: 15px;">
+                <header style="margin-bottom: 10px; border-bottom: none; padding-bottom: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong><span th:text="${review.authorName}">Имя</span></strong>
+                        <div style="color: #FFA000;">
+                            <span th:each="i : ${#numbers.sequence(1, review.rating)}">★</span>
+                        </div>
+                    </div>
+                </header>
+                <p th:text="${review.comment}" style="margin-bottom: 10px;">Текст отзыва...</p>
+                <footer style="margin-top: 0; padding-top: 0; border-top: none; font-size: 0.8rem; color: gray;">
+                    <span th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy HH:mm')}">Дата</span>
+                </footer>
+            </article>
+        </div>
+
+        <div>
+            <div sec:authorize="isAuthenticated()">
+                <article style="background-color: #1e262e; border: 1px solid #333;">
+                    <header style="border-bottom: 1px solid #333;">✍️ Оставить отзыв</header>
+
+                    <form th:action="@{/reviews/add}" method="post">
+                        <input type="hidden" name="parkingId" th:value="${parking.id}">
+
+                        <label>Оценка
+                            <select name="rating" required style="background-color: #2d3748; color: white; border: 1px solid #444;">
+                                <option value="5">⭐⭐⭐⭐⭐ - Отлично</option>
+                                <option value="4">⭐⭐⭐⭐ - Хорошо</option>
+                                <option value="3">⭐⭐⭐ - Нормально</option>
+                                <option value="2">⭐⭐ - Плохо</option>
+                                <option value="1">⭐ - Ужасно</option>
+                            </select>
+                        </label>
+
+                        <label>Комментарий
+                            <textarea name="comment" rows="3" required placeholder="Напишите, как прошла парковка..." style="background-color: #2d3748; color: white; border: 1px solid #444;"></textarea>
+                        </label>
+
+                        <button type="submit" class="contrast">Отправить отзыв</button>
+                    </form>
+                </article>
+            </div>
+
+            <div sec:authorize="!isAuthenticated()">
+                <article style="text-align: center;">
+                    <p>Хотите оставить отзыв?</p>
+                    <a href="/login" role="button" class="outline">Войдите в систему</a>
+                </article>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

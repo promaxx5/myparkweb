@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/head :: head}"></head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+
+    <div class="grid">
+
+        <div>
+            <article>
+                <header style="text-align: center; background-color: #1e262e; color: white;">
+                    <strong>Мой профиль</strong>
+                </header>
+
+                <div style="text-align: center; padding: 20px 0;">
+                    <div style="font-size: 4rem; margin-bottom: 10px;">👤</div>
+
+                    <h3 th:text="${user.fullName}" style="margin-bottom: 5px;">Имя Фамилия</h3>
+                    <p th:text="${user.email}" style="color: #a0aec0; font-size: 0.9rem;">email@test.com</p>
+
+                    <hr style="margin: 20px 0;">
+
+                    <small style="color: gray; display: block; margin-bottom: 10px;">Ваши роли:</small>
+                    <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                        <span th:each="r : ${user.roles}"
+                              th:text="${r.name}"
+                              style="background-color: #2d3748; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; color: #e2e8f0;">
+                            DRIVER
+                        </span>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div>
+
+            <div sec:authorize="hasAnyRole('DRIVER', 'BOTH', 'ADMIN')">
+                <h3 style="border-bottom: 2px solid #1095c1; padding-bottom: 10px; display: inline-block;">
+                    🚗 Кабинет водителя
+                </h3>
+
+                <details open style="margin-bottom: 20px;">
+                    <summary role="button" class="secondary outline">
+                        Мои автомобили (<span th:text="${myCars.size()}">0</span>)
+                    </summary>
+
+                    <div class="grid" style="margin-top: 15px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+
+                        <article th:each="car : ${myCars}" style="padding: 15px; border: 1px solid #2d3748; margin-bottom: 0;">
+                            <header style="padding: 0; border: none; margin-bottom: 10px;">
+                                <strong th:text="${car.make} + ' ' + ${car.model}" style="color: #1095c1;">BMW X5</strong>
+                            </header>
+                            <div style="background: #2d3748; padding: 5px; text-align: center; border-radius: 4px; font-family: monospace;">
+                                <span th:text="${car.licensePlate}">A000AA 77</span>
+                            </div>
+                        </article>
+
+                        <a href="/cars/add"
+                           role="button"
+                           class="outline dashed"
+                           style="border: 2px dashed #444; display: flex; align-items: center; justify-content: center; text-decoration: none; color: gray; height: auto; min-height: 100px;">
+                            + Добавить авто
+                        </a>
+                    </div>
+                </details>
+
+                <details>
+                    <summary role="button" class="outline">История бронирований</summary>
+                    <figure>
+                        <table role="grid">
+                            <thead>
+                            <tr>
+                                <th>Парковка</th>
+                                <th>Время</th>
+                                <th>Цена</th>
+                                <th>Статус</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="trip : ${myTrips}">
+                                <td>
+                                    <a th:href="@{/parkings/{id}(id=${trip.parking.id})}" th:text="${trip.parking.name}">Парковка</a>
+                                </td>
+                                <td style="font-size: 0.85rem;">
+                                    <span th:text="${#temporals.format(trip.startTime, 'dd.MM HH:mm')}"></span> <br>
+                                    <span style="color: gray;">⬇</span> <br>
+                                    <span th:text="${#temporals.format(trip.endTime, 'dd.MM HH:mm')}"></span>
+                                </td>
+                                <td><strong th:text="${trip.totalCost} + ' ₽'">500 ₽</strong></td>
+                                <td>
+                                    <span th:if="${trip.status == 'ACTIVE'}" style="color: #4cd964; font-weight: bold;">● Активно</span>
+                                    <span th:if="${trip.status == 'CANCELLED'}" style="color: #ff3b30;">● Отмена</span>
+                                    <span th:if="${trip.status == 'COMPLETED'}" style="color: gray;">● Завершено</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </figure>
+                    <p th:if="${myTrips.empty}" style="text-align: center; color: gray;">У вас пока нет поездок.</p>
+                </details>
+            </div>
+
+            <hr sec:authorize="hasRole('BOTH')" style="margin: 40px 0; border-top: 1px dashed #444;">
+
+            <div sec:authorize="hasAnyRole('OWNER', 'BOTH', 'ADMIN', 'MODERATOR')">
+                <h3 style="border-bottom: 2px solid #ff9800; padding-bottom: 10px; display: inline-block;">
+                    🅿️ Кабинет владельца
+                </h3>
+
+                <details open style="margin-bottom: 20px;">
+                    <summary role="button" class="secondary outline">
+                        Мои парковки (<span th:text="${myParkings.size()}">0</span>)
+                    </summary>
+
+                    <div class="grid" style="margin-top: 15px;">
+                        <article th:each="p : ${myParkings}" style="padding: 15px; border-left: 4px solid #ff9800;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div>
+                                    <strong th:text="${p.name}" style="font-size: 1.1rem;">Название</strong>
+                                    <p th:text="${p.address}" style="color: gray; font-size: 0.9rem; margin-bottom: 5px;">Адрес</p>
+                                </div>
+                                <a th:href="@{/parkings/{id}(id=${p.id})}" role="button" class="outline" style="padding: 5px 10px; font-size: 0.8rem;">Просмотр</a>
+                            </div>
+                            <footer style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; font-size: 0.85rem;">
+                                Рейтинг: <span style="color: #ff9800;">★ <span th:text="${p.averageRating}">0.0</span></span>
+                            </footer>
+                        </article>
+                    </div>
+
+                    <div style="margin-top: 15px; text-align: center;">
+                        <a href="/parkings/add" role="button" class="contrast">+ Сдать новое место</a>
+                    </div>
+                </details>
+
+                <details>
+                    <summary role="button" class="outline">Входящие заказы (Клиенты)</summary>
+                    <figure>
+                        <table role="grid">
+                            <thead>
+                            <tr>
+                                <th>Объект</th>
+                                <th>Клиент</th>
+                                <th>Авто</th>
+                                <th>Дата</th>
+                                <th>Сумма</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="inc : ${incomingBookings}">
+                                <td th:text="${inc.parking.name}">Гараж</td>
+                                <td>
+                                    <span th:text="${inc.driver.fullName}">Иван</span>
+                                </td>
+                                <td style="font-family: monospace;" th:text="${inc.car.licensePlate}">A777AA</td>
+                                <td>
+                                    <small th:text="${#temporals.format(inc.startTime, 'dd.MM HH:mm')}"></small>
+                                </td>
+                                <td style="color: #4cd964; font-weight: bold;" th:text="${'+' + inc.totalCost + ' ₽'}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </figure>
+                    <p th:if="${incomingBookings.empty}" style="text-align: center; color: gray;">Пока нет активных бронирований на ваших точках.</p>
+                </details>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

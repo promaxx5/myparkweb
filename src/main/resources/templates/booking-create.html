@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head}"></head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+    <article style="max-width: 600px; margin: 0 auto;">
+
+        <hgroup>
+            <h2>Бронирование места</h2>
+            <p>Подтвердите детали вашей поездки</p>
+        </hgroup>
+
+        <div style="background-color: #1e262e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #2d3748;">
+            <header style="margin-bottom: 10px; font-size: 1.1rem; border-bottom: none;">
+                Вы бронируете: <strong style="color: #1095c1;" th:text="${parking.name}">Название парковки</strong>
+            </header>
+            <div style="font-size: 0.9rem; color: #a0aec0;">
+                <p style="margin-bottom: 5px;">📍 Адрес: <span th:text="${parking.address}" style="color: #fff;"></span></p>
+                <p style="margin-bottom: 0;">💰 Цена: <span th:text="${parking.pricePerHour}" style="color: #fff; font-weight: bold;"></span> ₽/час</p>
+            </div>
+        </div>
+
+        <form th:action="@{/bookings/create}" th:object="${bookingDTO}" method="post">
+
+            <input type="hidden" th:field="*{parkingId}">
+
+            <label for="car">Выберите ваш автомобиль</label>
+            <select id="car" th:field="*{carId}" required th:errorclass="is-invalid">
+                <option value="" disabled selected>-- Выберите машину --</option>
+
+                <option th:if="${#lists.isEmpty(myCars)}" value="" disabled>Нет машин. Добавьте авто в профиле!</option>
+
+                <option th:each="car : ${myCars}"
+                        th:value="${car.id}"
+                        th:text="${car.make} + ' ' + ${car.model} + ' (' + ${car.licensePlate} + ')'">
+                </option>
+            </select>
+            <small style="color: #ff6b6b;" th:if="${#fields.hasErrors('carId')}" th:errors="*{carId}"></small>
+
+            <small th:if="${#lists.isEmpty(myCars)}">
+                <a href="/cars/add">Добавить автомобиль →</a>
+            </small>
+
+            <div class="grid" style="margin-top: 15px;">
+                <label>
+                    Начало
+                    <input type="datetime-local" th:field="*{startTime}" required th:errorclass="is-invalid">
+                    <small style="color: #ff6b6b;" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></small>
+                </label>
+                <label>
+                    Конец
+                    <input type="datetime-local" th:field="*{endTime}" required th:errorclass="is-invalid">
+                    <small style="color: #ff6b6b;" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></small>
+                </label>
+            </div>
+
+            <div class="grid" style="margin-top: 20px;">
+                <button type="submit" class="contrast">Подтвердить</button>
+                <a th:href="@{/parkings/{id}(id=${parking.id})}" role="button" class="secondary outline">Отмена</a>
+            </div>
+
+        </form>
+    </article>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>
